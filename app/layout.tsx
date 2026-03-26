@@ -9,24 +9,6 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: '--font-mono' });
 export const metadata: Metadata = {
   title: 'Malar Silks - Premium Textiles & Traditional Attires',
   description: 'Discover traditional and modern silk attires for women, men, girls and boys. Premium quality textiles and clothing at Malar Silks.',
-  generator: 'v0.app',
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
-  },
 }
 
 export const viewport: Viewport = {

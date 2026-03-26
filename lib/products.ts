@@ -36,7 +36,7 @@ export const PRODUCTS: Product[] = [
     id: '507f1f77bcf86cd799439014',
     name: 'Printed Cotton Dress',
     price: 1899,
-    image: 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQBziEQpUBWBtafYOTjKGYongwlOmb-BaqjCYMvthn-ejA6YeRLdM07RezOFqrvJ5Q6har5-gN2X13wjX7dsYpbEZjQV30otn6XSYlwRwqlhORDuLXk4oAgOA',
+    image: 'https://stylishlyme.com/wp-content/uploads/2015/09/how-to-dress-like-a-professional-woman.jpg',
     category: 'women',
     description: 'Comfortable cotton dress with beautiful traditional prints.',
     rating: 4.5,
@@ -175,25 +175,25 @@ export const CATEGORIES = [
     name: 'Women',
     id: 'women',
     description: 'Traditional and modern silk sarees and attires',
-    image: 'https://assets.vogue.in/photos/684bfa016041e1363d77590b/3:4/w_2560%2Cc_limit/Actor%2520Samantha%2520Prabhu%2520(@samantharuthprabhuoffl)%2520wears%2520the%2520Porto%2520sari%2520which%2520draws%2520from%2520the%2520Art%2520Deco%2520movement%2520of%2520the%2520decorative%2520arts%2520and%2520architecture%2C%2520that%2520originated%2520in%2520the%25201920s%2520and%2520developed%2520into%2520a%2520major%2520style%2520during%25201930s.True%2520to%2520the%2520%2520(1).jpg'
+    image: 'https://cdn.uconnectlabs.com/wp-content/uploads/sites/3/2021/04/business-formal-outfit.jpg'
   },
   {
     name: 'Men',
     id: 'men',
     description: 'Elegant formal and casual silk menswear',
-    image: 'https://www.bollywoodhungama.com/wp-content/uploads/2016/03/159-1597848_vijay-hd-wallpaper-download-1080p-vijay-images-hd.jpg'
+    image: 'https://thevou.com/wp-content/uploads/2025/06/two-piece-Business-Professional-suit.jpg'
   },
   {
     name: 'Girls',
     id: 'girls',
     description: 'Colorful traditional lehengas and ethnic wear',
-    image: 'https://images.filmibeat.com/ph-big/2026/01/sara-arjun1769174160_1.jpg'
+    image: 'https://img.freepik.com/premium-photo/cute-little-girls-picture-ai-generated_1003721-473.jpg'
   },
   {
     name: 'Boys',
     id: 'boys',
     description: 'Stylish traditional kurtas and festival sets',
-    image: 'https://wallpapers.com/images/hd/simbu-solid-red-button-down-shirt-z8lxgwa260bis11f.jpg'
+    image: 'https://static.vecteezy.com/system/resources/thumbnails/033/334/060/small_2x/cute-boy-wearing-blank-empty-white-t-shirt-mockup-for-design-template-ai-generated-free-photo.jpg'
   },
 ]
 

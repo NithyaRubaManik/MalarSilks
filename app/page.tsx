@@ -28,6 +28,9 @@ export default function Home() {
 
   const fetchDbProducts = async () => {
     try {
+      const ping = await fetch('http://localhost:5000/api/products').catch(() => null);
+      if (!ping) return;
+      
       const res = await fetch('http://localhost:5000/api/products')
       const data = await res.json()
       if (data.success) {
@@ -40,6 +43,9 @@ export default function Home() {
 
   const fetchPosts = async () => {
     try {
+      const ping = await fetch('http://localhost:5000/api/posts').catch(() => null);
+      if (!ping) return;
+
       const res = await fetch('http://localhost:5000/api/posts')
       const data = await res.json()
       if (data.success) {
