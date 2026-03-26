@@ -1,0 +1,143 @@
+@import 'tailwindcss';
+
+/* ===================================================
+   MALAR SILKS — PREMIUM DESIGN SYSTEM
+   Rich jewel-toned palette with strong contrast
+   =================================================== */
+
+:root {
+  /* === Brand Primary — Deep Crimson Gold === */
+  --background: oklch(0.99 0.002 60);
+  --foreground: oklch(0.15 0.02 30);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.02 30);
+
+  /* Primary: Deep Crimson Red — high contrast & silk-inspired */
+  --primary: oklch(0.45 0.22 25);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Secondary: Rich Gold/Amber */
+  --secondary: oklch(0.65 0.18 55);
+  --secondary-foreground: oklch(0.1 0.02 30);
+
+  /* Accent: Deep Jewel Purple */
+  --accent: oklch(0.45 0.2 290);
+  --accent-foreground: oklch(1 0 0);
+
+  --muted: oklch(0.94 0.01 60);
+  --muted-foreground: oklch(0.48 0.03 30);
+  --destructive: oklch(0.55 0.25 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.87 0.02 60);
+  --input: oklch(0.95 0.01 60);
+  --ring: oklch(0.45 0.22 25);
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: oklch(0.12 0.02 250);
+  --foreground: oklch(0.96 0.01 60);
+  --card: oklch(0.16 0.02 250);
+  --card-foreground: oklch(0.96 0.01 60);
+  --primary: oklch(0.7 0.2 45);
+  --primary-foreground: oklch(0.1 0.02 30);
+  --secondary: oklch(0.3 0.05 250);
+  --secondary-foreground: oklch(0.96 0.01 60);
+  --muted: oklch(0.22 0.02 250);
+  --muted-foreground: oklch(0.65 0.02 250);
+  --accent: oklch(0.55 0.18 290);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.6 0.25 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.25 0.02 250);
+  --input: oklch(0.22 0.02 250);
+  --ring: oklch(0.7 0.2 45);
+}
+
+@layer base {
+  * {
+    @apply border-gray-200 outline-blue-500/50;
+  }
+
+  body {
+    background-color: #fdf8f3;
+    color: #1a0f0a;
+    font-feature-settings: "kern" 1, "liga" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== BUTTON EXCELLENCE — always ultra-clear ===== */
+
+  /* Primary / CTA Button */
+  .btn-primary,
+  button.btn-primary {
+    background: linear-gradient(135deg, #c0392b 0%, #96281b 100%);
+    color: #ffffff;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 14px 32px;
+    font-size: 13px;
+    box-shadow: 0 4px 20px rgba(192, 57, 43, 0.4), 0 2px 6px rgba(0,0,0,0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    box-shadow: 0 8px 30px rgba(192, 57, 43, 0.5), 0 4px 10px rgba(0,0,0,0.2);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+    color: #1a0f0a;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 12px;
+    padding: 14px 32px;
+    font-size: 13px;
+    box-shadow: 0 4px 20px rgba(243, 156, 18, 0.4);
+    transition: all 0.3s ease;
+  }
+}
+
+/* ===== GLOBAL SCROLLBAR ===== */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #fdf8f3; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c0392b, #8e44ad);
+  border-radius: 8px;
+}
+
+/* ===== SELECTION HIGHLIGHT ===== */
+::selection {
+  background: rgba(192, 57, 43, 0.2);
+  color: #1a0f0a;
+}
+
+/* ===== UTILITY ANIMATIONS ===== */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes float-up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(192, 57, 43, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(192, 57, 43, 0.6); }
+}
+
+.animate-float { animation: float-up 3s ease-in-out infinite; }
+.animate-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 2s linear infinite;
+}
+.animate-glow { animation: glow-pulse 2s ease-in-out infinite; }

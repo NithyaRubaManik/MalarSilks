@@ -1,0 +1,6 @@
+
+> my-project@0.1.0 dev
+> next dev
+
+Terminate batch job (Y/N)? [?25h
+Terminate batch job (Y/N)? 
