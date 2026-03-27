@@ -24,8 +24,8 @@ export default function GalleryPage() {
   const [fetching, setFetching] = useState(true)
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null)
 
-  const API_URL = 'http://localhost:5000/api'
-  const BASE_URL = 'http://localhost:5000'
+  const API_URL = 'https://malarsilksshoppingplatform.onrender.com/api'
+  const BASE_URL = 'https://malarsilksshoppingplatform.onrender.com'
 
   const getFullImageUrl = (path: string) => {
     if (!path) return '/placeholder.jpg'

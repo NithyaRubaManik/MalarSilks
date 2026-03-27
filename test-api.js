@@ -1,6 +1,6 @@
 const http = require('http');
 
-http.get('http://localhost:5000/api/products', (res) => {
+http.get('https://malarsilksshoppingplatform.onrender.com/api/products', (res) => {
   let data = '';
   res.on('data', (chunk) => {
     data += chunk;

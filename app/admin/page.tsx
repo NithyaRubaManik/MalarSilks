@@ -124,7 +124,7 @@ export default function AdminPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products')
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/products')
       const data = await res.json()
       if (data.success) {
         setProducts(data.data.map((p: any) => ({ ...p, id: p._id || p.id })))
@@ -136,7 +136,7 @@ export default function AdminPage() {
 
   const fetchRegisteredUsers = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/users')
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/auth/users')
       const data = await res.json()
       if (data.success) {
         setRegisteredUsers(data.data.map((u: any) => ({ ...u, id: u._id || u.id })))
@@ -148,7 +148,7 @@ export default function AdminPage() {
 
   const fetchStaff = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/all')
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/admin/all')
       const data = await res.json()
       if (data.success) {
         setStaffList(data.data.map((s: any) => ({ ...s, id: s._id || s.id })))
@@ -160,7 +160,7 @@ export default function AdminPage() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/orders')
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/orders')
       const data = await res.json()
       if (data.success) {
         setOrders(data.data.map((o: any) => ({ ...o, id: o._id || o.id })))
@@ -172,7 +172,7 @@ export default function AdminPage() {
 
   const fetchPosts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/posts')
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/posts')
       const data = await res.json()
       if (data.success) {
         setPosts(data.data)
@@ -184,7 +184,7 @@ export default function AdminPage() {
 
   const fetchGallery = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/users')
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/users')
       const data = await res.json()
       if (data.success) {
         setGalleryItems(data.data)
@@ -197,7 +197,7 @@ export default function AdminPage() {
   const handleDeleteGalleryItem = async (id: string) => {
     if (!confirm('Are you sure you want to remove this gallery entry?')) return
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${id}`, { method: 'DELETE' })
+      const res = await fetch(`https://malarsilksshoppingplatform.onrender.com/api/users/${id}`, { method: 'DELETE' })
       const data = await res.json()
       if (data.success) {
         toast({ title: "Success", description: "Gallery entry removed" })
@@ -211,7 +211,7 @@ export default function AdminPage() {
   const handleCreateAdmin = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch('http://localhost:5000/api/admin/create', {
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/admin/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAdmin)
@@ -238,7 +238,7 @@ export default function AdminPage() {
     if (!confirm('Are you sure you want to remove this admin?')) return
 
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/${id}`, { method: 'DELETE' })
+      const res = await fetch(`https://malarsilksshoppingplatform.onrender.com/api/admin/${id}`, { method: 'DELETE' })
       const data = await res.json()
       if (data.success) {
         toast({ title: "Success", description: "Admin removed" })
@@ -291,7 +291,7 @@ export default function AdminPage() {
     formData.append('image', selectedFile)
 
     try {
-      const res = await fetch('http://localhost:5000/api/products', {
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/products', {
         method: 'POST',
         body: formData,
       })

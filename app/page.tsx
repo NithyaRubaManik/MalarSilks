@@ -28,10 +28,10 @@ export default function Home() {
 
   const fetchDbProducts = async () => {
     try {
-      const ping = await fetch('http://localhost:5000/api/products').catch(() => null);
+      const ping = await fetch('https://malarsilksshoppingplatform.onrender.com/api/products').catch(() => null);
       if (!ping) return;
       
-      const res = await fetch('http://localhost:5000/api/products')
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/products')
       const data = await res.json()
       if (data.success) {
         setDbProducts(data.data.map((p: any) => ({ ...p, id: p._id })))
@@ -43,10 +43,10 @@ export default function Home() {
 
   const fetchPosts = async () => {
     try {
-      const ping = await fetch('http://localhost:5000/api/posts').catch(() => null);
+      const ping = await fetch('https://malarsilksshoppingplatform.onrender.com/api/posts').catch(() => null);
       if (!ping) return;
 
-      const res = await fetch('http://localhost:5000/api/posts')
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/posts')
       const data = await res.json()
       if (data.success) {
         setPosts(data.data)
@@ -75,7 +75,7 @@ export default function Home() {
     formData.append('image', file)
 
     try {
-      const res = await fetch('http://localhost:5000/api/upload', {
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/upload', {
         method: 'POST',
         body: formData,
       })

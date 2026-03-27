@@ -37,7 +37,7 @@ export default function ProfilePage() {
     password: ''
   })
 
-  const API_URL = 'http://localhost:5000/api'
+  const API_URL = 'https://malarsilksshoppingplatform.onrender.com/api'
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -293,7 +293,7 @@ export default function ProfilePage() {
                           <div key={idx} className="flex items-center gap-4">
                             <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border bg-slate-50">
                               <img 
-                                src={item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`} 
+                                src={item.image.startsWith('http') ? item.image : `https://malarsilksshoppingplatform.onrender.com${item.image}`} 
                                 alt={item.name} 
                                 className="w-full h-full object-cover"
                               />

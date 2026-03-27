@@ -17,7 +17,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<UserData[]>([])
   const [loading, setLoading] = useState(true)
 
-  const BASE_URL = 'http://localhost:5000'
+  const BASE_URL = 'https://malarsilksshoppingplatform.onrender.com'
 
   useEffect(() => {
     const fetchUsers = async () => {

@@ -18,7 +18,7 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
 
-  const BASE_URL = 'http://localhost:5000'
+  const BASE_URL = 'https://malarsilksshoppingplatform.onrender.com'
 
   useEffect(() => {
     const fetchProduct = async () => {

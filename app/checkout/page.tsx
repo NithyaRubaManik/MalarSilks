@@ -36,7 +36,7 @@ export default function CheckoutPage() {
       if (isLoggedIn && user?.email) {
         setLoadingProfile(true)
         try {
-          const res = await fetch(`http://localhost:5000/api/auth/profile/${user.email}`)
+          const res = await fetch(`https://malarsilksshoppingplatform.onrender.com/api/auth/profile/${user.email}`)
           const data = await res.json()
           if (data.success) {
             const u = data.data
@@ -108,7 +108,7 @@ export default function CheckoutPage() {
         totalPrice: total
       }
 
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)

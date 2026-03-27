@@ -22,7 +22,7 @@ function ShopContent() {
 
   const fetchDbProducts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products')
+      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/products')
       const data = await res.json()
       if (data.success) {
         const mapped = data.data.map((p: any) => ({ ...p, id: p._id || p.id }))

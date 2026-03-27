@@ -35,7 +35,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="relative aspect-[3/4] bg-gradient-to-br from-orange-50 to-red-50 overflow-hidden">
         <Link href={`/product/${product.id}`} className="block w-full h-full">
           <img
-            src={product.image.startsWith('http') ? product.image : `http://localhost:5000${product.image}`}
+            src={product.image.startsWith('http') ? product.image : `https://malarsilksshoppingplatform.onrender.com${product.image}`}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
