@@ -156,7 +156,10 @@ export default function AdminPage() {
 
   const fetchStaff = async () => {
     try {
-      const res = await fetch(`${CONFIG.API.BASE_URL}/api/admin/all`)
+      const token = localStorage.getItem('adminToken')
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/admin/all`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       const data = await res.json()
       if (data.success) {
         setStaffList(data.data.map((s: any) => ({ ...s, id: s._id || s.id })))
@@ -204,9 +207,13 @@ export default function AdminPage() {
 
   const handleToggleGalleryApproval = async (id: string, currentStatus: boolean) => {
     try {
+      const token = localStorage.getItem('adminToken')
       const res = await fetch(`${CONFIG.API.BASE_URL}/api/submissions/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ is_approved: !currentStatus })
       })
       const data = await res.json()
@@ -222,7 +229,11 @@ export default function AdminPage() {
   const handleDeleteGalleryItem = async (id: string) => {
     if (!confirm('Are you sure you want to remove this gallery entry?')) return
     try {
-      const res = await fetch(`${CONFIG.API.ENDPOINTS.USERS}/${id}`, { method: 'DELETE' })
+      const token = localStorage.getItem('adminToken')
+      const res = await fetch(`${CONFIG.API.ENDPOINTS.USERS}/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       const data = await res.json()
       if (data.success) {
         toast({ title: "Success", description: "Gallery entry removed" })
@@ -236,9 +247,13 @@ export default function AdminPage() {
   const handleCreateAdmin = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      const token = localStorage.getItem('adminToken')
       const res = await fetch(`${CONFIG.API.BASE_URL}/api/admin/create`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(newAdmin)
       })
       const data = await res.json()
@@ -263,7 +278,11 @@ export default function AdminPage() {
     if (!confirm('Are you sure you want to remove this admin?')) return
 
     try {
-      const res = await fetch(`${CONFIG.API.BASE_URL}/api/admin/${id}`, { method: 'DELETE' })
+      const token = localStorage.getItem('adminToken')
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/admin/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       const data = await res.json()
       if (data.success) {
         toast({ title: "Success", description: "Admin removed" })
@@ -277,7 +296,11 @@ export default function AdminPage() {
   const handleDeleteOrder = async (id: string) => {
     if (!confirm('Are you sure you want to PERMANENTLY delete this order and its records?')) return
     try {
-      const res = await fetch(`${CONFIG.API.BASE_URL}/api/orders/${id}`, { method: 'DELETE' })
+      const token = localStorage.getItem('adminToken')
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/orders/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       const data = await res.json()
       if (data.success) {
         toast({ title: "Success", description: "Order deleted successfully" })
@@ -330,8 +353,10 @@ export default function AdminPage() {
     formData.append('image', selectedFile)
 
     try {
+      const token = localStorage.getItem('adminToken')
       const res = await fetch(CONFIG.API.ENDPOINTS.PRODUCTS, {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
       })
       const data = await res.json()
@@ -363,8 +388,10 @@ export default function AdminPage() {
     if (selectedFile) formData.append('image', selectedFile)
 
     try {
+      const token = localStorage.getItem('adminToken')
       const res = await fetch(`${CONFIG.API.ENDPOINTS.PRODUCTS}/${editingProductId}`, {
         method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
       })
       const data = await res.json()
@@ -398,8 +425,10 @@ export default function AdminPage() {
 
   const handleDeleteProduct = async (id: string) => {
     try {
+      const token = localStorage.getItem('adminToken')
       const res = await fetch(`${CONFIG.API.ENDPOINTS.PRODUCTS}/${id}`, {
         method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
       })
       const data = await res.json()
       if (data.success) {

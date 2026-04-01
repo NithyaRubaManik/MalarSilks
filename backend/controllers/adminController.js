@@ -1,5 +1,13 @@
 const { pool } = require('../config/db');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+// Generate JWT
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: '30d',
+    });
+};
 
 // @desc    Admin login
 // @route   POST /api/admin/login
@@ -25,7 +33,7 @@ const loginAdmin = async (req, res) => {
         res.status(200).json({
             success: true,
             email: admin.email,
-            token: "fake-jwt-token-for-now"
+            token: generateToken(admin.id)
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -42,7 +50,7 @@ const seedAdmin = async (req, res) => {
         }
 
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash('Malarsilks@2006', salt);
+        const hashedPassword = await bcrypt.hash('Malarsilks@2026', salt);
 
         await pool.query('INSERT INTO admins (email, password) VALUES ($1, $2)', ['malarsilkskarivalam@gmail.com', hashedPassword]);
 

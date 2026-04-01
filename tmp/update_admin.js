@@ -5,7 +5,7 @@ require('dotenv').config({ path: 'backend/.env' });
 async function updateAdmin() {
     try {
         const email = 'malarsilkskarivalam@gmail.com';
-        const password = 'Malarsilks@2006';
+        const password = 'Malarsilks@2026';
         
         console.log(`Setting up Admin: ${email}`);
         

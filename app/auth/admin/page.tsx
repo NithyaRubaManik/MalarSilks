@@ -47,6 +47,7 @@ export default function AdminLoginPage() {
         localStorage.setItem('adminAuth', 'true')
         localStorage.setItem('userRole', 'admin')
         localStorage.setItem('userEmail', data.email)
+        localStorage.setItem('adminToken', data.token)
 
         toast({
           title: "Login Successful",

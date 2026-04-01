@@ -34,19 +34,21 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage });
 
+const { protect } = require('../middleware/authMiddleware');
+
 // User Routes
 router.post('/upload', upload.single('image'), registerUser);
 router.get('/users', getUsers);
 router.get('/users/:id', getUser);
-router.delete('/users/:id', deleteUser);
-router.get('/submissions', getAllSubmissions);
-router.put('/submissions/:id', updateGalleryStatus);
+router.delete('/users/:id', protect, deleteUser);
+router.get('/submissions', protect, getAllSubmissions);
+router.put('/submissions/:id', protect, updateGalleryStatus);
 
 // Product Routes
-router.post('/products', upload.single('image'), addProduct);
+router.post('/products', protect, upload.single('image'), addProduct);
 router.get('/products', getProducts);
 router.get('/products/:id', getProductById);
-router.put('/products/:id', upload.single('image'), updateProduct);
-router.delete('/products/:id', deleteProduct);
+router.put('/products/:id', protect, upload.single('image'), updateProduct);
+router.delete('/products/:id', protect, deleteProduct);
 
 module.exports = router;
