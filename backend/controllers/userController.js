@@ -1,34 +1,25 @@
-const GalleryEntry = require('../models/GalleryEntry');
-const path = require('path');
+const { pool } = require('../config/db');
 
-// @desc    Register a new gallery entry (User with image)
+// @desc    Register a new gallery entry (User with image & comment)
 // @route   POST /api/upload
 const registerUser = async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { name, email, comment } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ message: 'Please upload an image' });
         }
 
-        const imagePath = `/uploads/${req.file.filename}`;
+        const imageUrl = req.file.path;
 
-        const protocol = req.protocol;
-        const host = req.get('host');
-        const baseUrl = `${protocol}://${host}`;
-
-        const entry = await GalleryEntry.create({
-            name,
-            email,
-            image: imagePath
-        });
+        const result = await pool.query(
+            'INSERT INTO gallery_entries (name, email, image, comment, is_approved) VALUES ($1, $2, $3, $4, FALSE) RETURNING *',
+            [name, email, imageUrl, comment || '']
+        );
 
         res.status(201).json({
             success: true,
-            data: {
-                ...entry._doc,
-                image: entry.image.startsWith('http') ? entry.image : `${baseUrl}${entry.image}`
-            }
+            data: result.rows[0]
         });
     } catch (error) {
         res.status(400).json({
@@ -38,31 +29,51 @@ const registerUser = async (req, res) => {
     }
 };
 
-// @desc    Get all gallery users
+// @desc    Get all APPROVED gallery users (FOR PUBLIC DISPLAY)
 // @route   GET /api/users
 const getUsers = async (req, res) => {
     try {
-        const users = await GalleryEntry.find().sort({ createdAt: -1 });
-        
-        const protocol = req.protocol;
-        const host = req.get('host');
-        const baseUrl = `${protocol}://${host}`;
-
-        const formattedUsers = users.map(user => ({
-            ...user._doc,
-            image: user.image.startsWith('http') ? user.image : `${baseUrl}${user.image}`
-        }));
+        const result = await pool.query('SELECT *, created_at AS "createdAt" FROM gallery_entries WHERE is_approved = TRUE ORDER BY created_at DESC');
 
         res.status(200).json({
             success: true,
-            count: users.length,
-            data: formattedUsers
+            count: result.rowCount,
+            data: result.rows
         });
     } catch (error) {
         res.status(400).json({
             success: false,
             message: error.message
         });
+    }
+};
+
+// @desc    Get ALL submissions (FOR ADMIN)
+const getAllSubmissions = async (req, res) => {
+    try {
+        const result = await pool.query('SELECT *, created_at AS "createdAt" FROM gallery_entries ORDER BY created_at DESC');
+        res.status(200).json({
+            success: true,
+            data: result.rows
+        });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+// @desc    Approve/Reject gallery entry (FOR ADMIN)
+const updateGalleryStatus = async (req, res) => {
+    try {
+        const { is_approved } = req.body;
+        const result = await pool.query('UPDATE gallery_entries SET is_approved = $1 WHERE id = $2 RETURNING *', [is_approved, req.params.id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, message: 'Entry not found' });
+        }
+
+        res.status(200).json({ success: true, data: result.rows[0] });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 
@@ -70,25 +81,18 @@ const getUsers = async (req, res) => {
 // @route   GET /api/users/:id
 const getUser = async (req, res) => {
     try {
-        const user = await GalleryEntry.findById(req.params.id);
+        const result = await pool.query('SELECT * FROM gallery_entries WHERE id = $1', [req.params.id]);
 
-        if (!user) {
+        if (result.rowCount === 0) {
             return res.status(404).json({
                 success: false,
                 message: 'User not found'
             });
         }
 
-        const protocol = req.protocol;
-        const host = req.get('host');
-        const baseUrl = `${protocol}://${host}`;
-
         res.status(200).json({
             success: true,
-            data: {
-                ...user._doc,
-                image: user.image.startsWith('http') ? user.image : `${baseUrl}${user.image}`
-            }
+            data: result.rows[0]
         });
     } catch (error) {
         res.status(400).json({
@@ -97,13 +101,14 @@ const getUser = async (req, res) => {
         });
     }
 };
+
 // @desc    Delete gallery user
 // @route   DELETE /api/users/:id
 const deleteUser = async (req, res) => {
     try {
-        const user = await GalleryEntry.findByIdAndDelete(req.params.id);
+        const result = await pool.query('DELETE FROM gallery_entries WHERE id = $1 RETURNING *', [req.params.id]);
 
-        if (!user) {
+        if (result.rowCount === 0) {
             return res.status(404).json({
                 success: false,
                 message: 'User not found'
@@ -126,5 +131,7 @@ module.exports = {
     registerUser,
     getUsers,
     getUser,
-    deleteUser
+    deleteUser,
+    getAllSubmissions,
+    updateGalleryStatus
 };

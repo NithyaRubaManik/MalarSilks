@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { registerUser, getUsers, getUser, deleteUser } = require('../controllers/userController');
+const { registerUser, getUsers, getUser, deleteUser, getAllSubmissions, updateGalleryStatus } = require('../controllers/userController');
 const { addProduct, getProducts, deleteProduct, updateProduct, getProductById } = require('../controllers/productController');
 
 // Ensure uploads directory exists
@@ -12,35 +12,35 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer storage engine
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        cb(null, `${Date.now()}-${file.originalname}`);
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+// Configure Cloudinary (User needs to add these to .env)
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Configure Cloudinary Storage for Multer
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'malar_silks_products',
+        allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+        transformation: [{ width: 1000, height: 1000, crop: 'limit' }]
     }
 });
 
-// File filter (optional but good practice)
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image')) {
-        cb(null, true);
-    } else {
-        cb(new Error('Not an image! Please upload an image.'), false);
-    }
-};
-
-const upload = multer({ 
-    storage: storage,
-    fileFilter: fileFilter
-});
+const upload = multer({ storage: storage });
 
 // User Routes
 router.post('/upload', upload.single('image'), registerUser);
 router.get('/users', getUsers);
 router.get('/users/:id', getUser);
 router.delete('/users/:id', deleteUser);
+router.get('/submissions', getAllSubmissions);
+router.put('/submissions/:id', updateGalleryStatus);
 
 // Product Routes
 router.post('/products', upload.single('image'), addProduct);

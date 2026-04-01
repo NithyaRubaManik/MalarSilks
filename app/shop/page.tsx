@@ -7,6 +7,7 @@ import { ProductCard } from '@/components/product-card'
 import { cn } from '@/lib/utils'
 import { PRODUCTS, CATEGORIES } from '@/lib/products'
 import type { Product } from '@/lib/app-context'
+import { CONFIG } from '@/lib/config'
 
 function ShopContent() {
   const searchParams = useSearchParams()
@@ -22,7 +23,7 @@ function ShopContent() {
 
   const fetchDbProducts = async () => {
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/products')
+      const res = await fetch(CONFIG.API.ENDPOINTS.PRODUCTS)
       const data = await res.json()
       if (data.success) {
         const mapped = data.data.map((p: any) => ({ ...p, id: p._id || p.id }))

@@ -11,6 +11,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { User, Eye, EyeOff } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { useApp } from '@/lib/app-context'
+import { CONFIG } from '@/lib/config'
+
 export default function LoginPage() {
   const { toast } = useToast()
   const router = useRouter()
@@ -37,7 +39,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/auth/login', {
+      const res = await fetch(CONFIG.API.ENDPOINTS.AUTH.LOGIN, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

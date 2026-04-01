@@ -1,4 +1,5 @@
-const User = require('../models/User');
+const { pool } = require('../config/db');
+const bcrypt = require('bcryptjs');
 
 // @desc    Register a new user
 // @route   POST /api/auth/signup
@@ -6,31 +7,28 @@ const signup = async (req, res) => {
     try {
         const { name, email, password, phone, address, city, pincode } = req.body;
 
-        const userExists = await User.findOne({ email });
-
-        if (userExists) {
+        const checkResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (checkResult.rowCount > 0) {
             return res.status(400).json({ success: false, message: 'User already exists' });
         }
 
-        const user = await User.create({
-            name,
-            email,
-            password,
-            phone,
-            address,
-            city,
-            pincode
-        });
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-        if (user) {
-            res.status(201).json({
-                success: true,
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role
-            });
-        }
+        const result = await pool.query(
+            'INSERT INTO users (name, email, password, phone, address, city, pincode) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, email, role',
+            [name, email, hashedPassword, phone, address, city, pincode]
+        );
+
+        const user = result.rows[0];
+
+        res.status(201).json({
+            success: true,
+            _id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -42,12 +40,13 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await User.findOne({ email }).select('+password');
+        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        const user = result.rows[0];
 
-        if (user && (await user.matchPassword(password))) {
+        if (user && (await bcrypt.compare(password, user.password))) {
             res.json({
                 success: true,
-                _id: user._id,
+                _id: user.id,
                 name: user.name,
                 email: user.email,
                 role: user.role
@@ -61,14 +60,13 @@ const login = async (req, res) => {
 };
 
 // @desc    Get all registered users (for Admin)
-// @route   GET /api/auth/users
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().sort({ createdAt: -1 });
+        const result = await pool.query('SELECT id, name, email, role, created_at AS "createdAt" FROM users ORDER BY created_at DESC');
         res.status(200).json({
             success: true,
-            count: users.length,
-            data: users
+            count: result.rowCount,
+            data: result.rows
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -76,14 +74,13 @@ const getAllUsers = async (req, res) => {
 };
 
 // @desc    Get user profile by email
-// @route   GET /api/auth/profile/:email
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findOne({ email: req.params.email });
-        if (user) {
+        const result = await pool.query('SELECT id, name, email, role, phone, address, city, pincode FROM users WHERE email = $1', [req.params.email]);
+        if (result.rowCount > 0) {
             res.status(200).json({
                 success: true,
-                data: user
+                data: result.rows[0]
             });
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
@@ -94,27 +91,30 @@ const getUserProfile = async (req, res) => {
 };
 
 // @desc    Update user profile
-// @route   PUT /api/auth/profile
 const updateUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.body.id);
+        const { id, name, phone, address, city, pincode, password } = req.body;
 
-        if (user) {
-            user.name = req.body.name || user.name;
-            user.phone = req.body.phone || user.phone;
-            user.address = req.body.address || user.address;
-            user.city = req.body.city || user.city;
-            user.pincode = req.body.pincode || user.pincode;
+        let query = 'UPDATE users SET name = $1, phone = $2, address = $3, city = $4, pincode = $5';
+        let values = [name, phone, address, city, pincode];
+        
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            query += ', password = $6 WHERE id = $7 RETURNING *';
+            values.push(hashedPassword, id);
+        } else {
+            query += ' WHERE id = $6 RETURNING *';
+            values.push(id);
+        }
 
-            if (req.body.password) {
-                user.password = req.body.password;
-            }
+        const result = await pool.query(query, values);
 
-            const updatedUser = await user.save();
-
+        if (result.rowCount > 0) {
+            const updatedUser = result.rows[0];
             res.json({
                 success: true,
-                _id: updatedUser._id,
+                _id: updatedUser.id,
                 name: updatedUser.name,
                 email: updatedUser.email,
                 role: updatedUser.role,

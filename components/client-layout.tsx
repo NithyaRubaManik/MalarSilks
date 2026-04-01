@@ -7,7 +7,6 @@ import { VoiceAssistant } from '@/components/voice-assistant'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { usePathname } from 'next/navigation'
-import { Analytics } from '@vercel/analytics/next'
 
 export function ClientLayout({ children, geistVars }: { children: React.ReactNode, geistVars: string }) {
   const pathname = usePathname()
@@ -26,7 +25,6 @@ export function ClientLayout({ children, geistVars }: { children: React.ReactNod
         </main>
         {!pathname.startsWith('/admin') && <Footer />}
       </AppProvider>
-      <Analytics />
       <VoiceAssistant />
       <Toaster />
     </ThemeProvider>

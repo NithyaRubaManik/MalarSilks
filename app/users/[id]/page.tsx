@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ArrowLeft, Mail, Calendar, User as UserIcon, Loader2 } from 'lucide-react'
+import { CONFIG } from '@/lib/config'
 
 interface UserData {
   _id: string
@@ -20,12 +21,11 @@ export default function UserDetailPage() {
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const BASE_URL = 'https://malarsilksshoppingplatform.onrender.com'
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/api/users/${id}`)
+        const res = await fetch(`${CONFIG.API.ENDPOINTS.USERS}/${id}`)
         const data = await res.json()
         if (data.success) {
           setUser(data.data)
@@ -71,7 +71,7 @@ export default function UserDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
           <img
-            src={user.image.startsWith('http') ? user.image : `${BASE_URL}${user.image}`}
+            src={CONFIG.IMAGES.getSecureImageUrl(user.image)}
             alt={user.name}
             className="w-full h-full object-cover"
           />

@@ -1,4 +1,4 @@
-const Post = require('../models/Post');
+const { pool } = require('../config/db');
 
 // @desc    Add a new post
 // @route   POST /api/posts
@@ -10,17 +10,16 @@ const addPost = async (req, res) => {
             return res.status(400).json({ message: 'Please upload an image for the post' });
         }
 
-        const imagePath = `/uploads/${req.file.filename}`;
+        const imageUrl = req.file.path; // Cloudinary URL
 
-        const post = await Post.create({
-            title,
-            description,
-            imageUrl: imagePath
-        });
+        const result = await pool.query(
+            'INSERT INTO posts (title, description, image_url) VALUES ($1, $2, $3) RETURNING *',
+            [title, description, imageUrl]
+        );
 
         res.status(201).json({
             success: true,
-            data: post
+            data: result.rows[0]
         });
     } catch (error) {
         res.status(400).json({
@@ -34,22 +33,12 @@ const addPost = async (req, res) => {
 // @route   GET /api/posts
 const getPosts = async (req, res) => {
     try {
-        const posts = await Post.find().sort({ createdAt: -1 });
-
-        // Map posts to include the base URL for the imageUrl if it's a relative path
-        const protocol = req.protocol;
-        const host = req.get('host');
-        const baseUrl = `${protocol}://${host}`;
-
-        const formattedPosts = posts.map(post => ({
-            ...post._doc,
-            imageUrl: post.imageUrl.startsWith('http') ? post.imageUrl : `${baseUrl}${post.imageUrl}`
-        }));
+        const result = await pool.query('SELECT id, title, description, image_url as "imageUrl", created_at as "createdAt" FROM posts ORDER BY created_at DESC');
 
         res.status(200).json({
             success: true,
-            count: posts.length,
-            data: formattedPosts
+            count: result.rowCount,
+            data: result.rows
         });
     } catch (error) {
         res.status(400).json({
@@ -63,16 +52,14 @@ const getPosts = async (req, res) => {
 // @route   DELETE /api/posts/:id
 const deletePost = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id);
+        const result = await pool.query('DELETE FROM posts WHERE id = $1 RETURNING *', [req.params.id]);
 
-        if (!post) {
+        if (result.rowCount === 0) {
             return res.status(404).json({
                 success: false,
                 message: 'Post not found'
             });
         }
-
-        await post.deleteOne();
 
         res.status(200).json({
             success: true,

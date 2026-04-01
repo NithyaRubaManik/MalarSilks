@@ -2,15 +2,13 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const connectDB = require('./config/db');
+const { connectDB } = require('./config/db');
+connectDB();
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const postRoutes = require('./routes/postRoutes');
-
-// Connect to Database
-connectDB();
 
 const app = express();
 

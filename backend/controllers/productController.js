@@ -1,4 +1,4 @@
-const Product = require('../models/Product');
+const { pool } = require('../config/db');
 
 // @desc    Add a new product
 // @route   POST /api/products
@@ -10,26 +10,17 @@ const addProduct = async (req, res) => {
             return res.status(400).json({ message: 'Please upload a product image' });
         }
 
-        const imagePath = `/uploads/${req.file.filename}`;
+        // With Cloudinary, req.file.path is the full URL
+        const imageUrl = req.file.path;
 
-        const protocol = req.protocol;
-        const host = req.get('host');
-        const baseUrl = `${protocol}://${host}`;
-
-        const product = await Product.create({
-            name,
-            price,
-            category,
-            description,
-            image: imagePath
-        });
+        const result = await pool.query(
+            'INSERT INTO products (name, price, category, image, description) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [name, price, category, imageUrl, description]
+        );
 
         res.status(201).json({
             success: true,
-            data: {
-                ...product._doc,
-                image: product.image.startsWith('http') ? product.image : `${baseUrl}${product.image}`
-            }
+            data: result.rows[0]
         });
     } catch (error) {
         res.status(400).json({
@@ -43,21 +34,12 @@ const addProduct = async (req, res) => {
 // @route   GET /api/products
 const getProducts = async (req, res) => {
     try {
-        const products = await Product.find().sort({ createdAt: -1 });
-        
-        const protocol = req.protocol;
-        const host = req.get('host');
-        const baseUrl = `${protocol}://${host}`;
-
-        const formattedProducts = products.map(product => ({
-            ...product._doc,
-            image: product.image.startsWith('http') ? product.image : `${baseUrl}${product.image}`
-        }));
+        const result = await pool.query('SELECT id, name, price, category, image, description, in_stock as "inStock", created_at as "createdAt" FROM products ORDER BY created_at DESC');
 
         res.status(200).json({
             success: true,
-            count: products.length,
-            data: formattedProducts
+            count: result.rowCount,
+            data: result.rows
         });
     } catch (error) {
         res.status(400).json({
@@ -72,32 +54,28 @@ const getProducts = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { name, price, category, description, inStock } = req.body;
-        let updateData = { name, price, category, description, inStock };
+        const productId = req.params.id;
 
-        // If new image is uploaded
+        let query = 'UPDATE products SET name = $1, price = $2, category = $3, description = $4, in_stock = $5';
+        let values = [name, price, category, description, String(inStock) === 'true'];
+
         if (req.file) {
-            updateData.image = `/uploads/${req.file.filename}`;
+            query += ', image = $6 WHERE id = $7 RETURNING id, name, price, category, image, description, in_stock as "inStock", created_at as "createdAt"';
+            values.push(req.file.path, productId);
+        } else {
+            query += ' WHERE id = $6 RETURNING id, name, price, category, image, description, in_stock as "inStock", created_at as "createdAt"';
+            values.push(productId);
         }
 
-        const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
-            new: true,
-            runValidators: true
-        });
+        const result = await pool.query(query, values);
 
-        if (!product) {
+        if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        const protocol = req.protocol;
-        const host = req.get('host');
-        const baseUrl = `${protocol}://${host}`;
-
         res.status(200).json({
             success: true,
-            data: {
-                ...product._doc,
-                image: product.image.startsWith('http') ? product.image : `${baseUrl}${product.image}`
-            }
+            data: result.rows[0]
         });
     } catch (error) {
         res.status(400).json({
@@ -111,9 +89,9 @@ const updateProduct = async (req, res) => {
 // @route   DELETE /api/products/:id
 const deleteProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndDelete(req.params.id);
+        const result = await pool.query('DELETE FROM products WHERE id = $1 RETURNING *', [req.params.id]);
 
-        if (!product) {
+        if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
@@ -133,22 +111,15 @@ const deleteProduct = async (req, res) => {
 // @route   GET /api/products/:id
 const getProductById = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const result = await pool.query('SELECT id, name, price, category, image, description, in_stock as "inStock", created_at as "createdAt" FROM products WHERE id = $1', [req.params.id]);
 
-        if (!product) {
+        if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        const protocol = req.protocol;
-        const host = req.get('host');
-        const baseUrl = `${protocol}://${host}`;
-
         res.status(200).json({
             success: true,
-            data: {
-                ...product._doc,
-                image: product.image.startsWith('http') ? product.image : `${baseUrl}${product.image}`
-            }
+            data: result.rows[0]
         });
     } catch (error) {
         res.status(400).json({

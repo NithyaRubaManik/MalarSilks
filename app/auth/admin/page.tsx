@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Shield, Eye, EyeOff } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { CONFIG } from '@/lib/config'
 
 export default function AdminLoginPage() {
   const { toast } = useToast()
@@ -34,7 +35,7 @@ export default function AdminLoginPage() {
     setError('')
 
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/admin/login', {
+      const res = await fetch(CONFIG.API.ENDPOINTS.AUTH.ADMIN_LOGIN, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

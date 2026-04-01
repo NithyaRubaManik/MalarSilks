@@ -44,9 +44,14 @@ export function Footer() {
           <div className="md:col-span-2 space-y-8">
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/30">The Maison</h4>
             <ul className="space-y-4">
-              {['About Us', 'Boutique', 'Studio', 'Heritage'].map(item => (
-                <li key={item}>
-                  <Link href={`/${item.toLowerCase()}`} className="text-sm font-medium text-white/60 hover:text-white transition-colors">{item}</Link>
+              {[
+                { label: 'Shop', href: '/shop' },
+                { label: 'Gallery', href: '/gallery' },
+                { label: 'AI Advisor', href: '/outfit-advisor' },
+                { label: 'Contact', href: '/contact' }
+              ].map(item => (
+                <li key={item.label}>
+                  <Link href={item.href} className="text-sm font-medium text-white/60 hover:text-white transition-colors">{item.label}</Link>
                 </li>
               ))}
             </ul>
@@ -69,17 +74,17 @@ export function Footer() {
                <div className="flex gap-4">
                   <MapPin className="w-5 h-5 text-primary shrink-0" />
                   <p className="text-sm font-medium text-white/60 leading-relaxed">
-                    The Highland Tower, 12th Floor<br/>
-                    Parliament Street, Chennai 600001
+                    8/213, Rajapalayam Road<br/>
+                    Karivalam, Tamil Nadu 627753
                   </p>
                </div>
                <div className="flex gap-4">
                   <Mail className="w-5 h-5 text-primary shrink-0" />
-                  <p className="text-sm font-medium text-white/60">concierge@malarsilks.luxury</p>
+                  <p className="text-sm font-medium text-white/60">malarsilkskarivalam@gmail.com</p>
                </div>
                <div className="flex gap-4">
                   <Phone className="w-5 h-5 text-primary shrink-0" />
-                  <p className="text-sm font-medium text-white/60">+91 (44) 2800 9000</p>
+                  <p className="text-sm font-medium text-white/60">+91 94432 50387</p>
                </div>
             </div>
           </div>
@@ -88,7 +93,7 @@ export function Footer() {
         {/* Legal & Final Finish */}
         <div className="mt-32 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20">
-             &copy; 2024 Malar Silks Private Limited. All Rights Reserved.
+             &copy; 2026 Malar Silks Private Limited. All Rights Reserved.
            </p>
            <div className="flex gap-8">
               {['Privacy', 'Terms', 'Sustainability'].map(item => (

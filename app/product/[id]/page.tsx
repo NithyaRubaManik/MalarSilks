@@ -8,6 +8,7 @@ import { getProductById, PRODUCTS } from '@/lib/products'
 import { useApp, Product } from '@/lib/app-context'
 import { ProductCard } from '@/components/product-card'
 import { cn } from '@/lib/utils'
+import { CONFIG } from '@/lib/config'
 
 export default function ProductPage() {
   const params = useParams()
@@ -18,7 +19,7 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
 
-  const BASE_URL = 'https://malarsilksshoppingplatform.onrender.com'
+
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -31,12 +32,13 @@ export default function ProductPage() {
       }
 
       try {
-        const res = await fetch(`${BASE_URL}/api/products/${params.id}`)
+        const res = await fetch(`${CONFIG.API.BASE_URL}/api/products/${params.id}`)
         const data = await res.json()
         if (data.success) {
           setProduct({
             ...data.data,
-            id: data.data._id
+            id: data.data.id || data.data._id,
+            inStock: data.data.inStock ?? data.data.in_stock ?? true
           })
         }
       } catch (error) {
@@ -119,7 +121,7 @@ export default function ProductPage() {
           <div className="lg:col-span-7 space-y-8 animate-in fade-in slide-in-from-left-12 duration-1000">
             <div className="group relative aspect-4/5 md:aspect-square lg:aspect-4/5 bg-white rounded-[3rem] overflow-hidden shadow-2xl shadow-black/[0.05] ring-1 ring-black/[0.02]">
               <img
-                src={product.image.startsWith('http') ? product.image : `${BASE_URL}${product.image}`}
+                src={CONFIG.IMAGES.getSecureImageUrl(product.image)}
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
               />
@@ -151,7 +153,7 @@ export default function ProductPage() {
                       <Star
                         key={i}
                         className={`w-4 h-4 ${
-                          i < Math.floor(product.rating)
+                          i < Math.floor(product.rating || 5)
                             ? 'fill-primary text-primary'
                             : 'text-gray-200'
                         }`}
@@ -160,7 +162,7 @@ export default function ProductPage() {
                   </div>
                   <div className="w-px h-4 bg-gray-200" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                    Curation Rating {product.rating.toFixed(1)}
+                    Curation Rating {(product.rating || 5.0).toFixed(1)}
                   </span>
                 </div>
               </div>

@@ -1,4 +1,5 @@
-const Admin = require('../models/Admin');
+const { pool } = require('../config/db');
+const bcrypt = require('bcryptjs');
 
 // @desc    Admin login
 // @route   POST /api/admin/login
@@ -7,14 +8,15 @@ const loginAdmin = async (req, res) => {
         const { email, password } = req.body;
 
         // Check for admin
-        const admin = await Admin.findOne({ email }).select('+password');
+        const result = await pool.query('SELECT * FROM admins WHERE email = $1', [email]);
+        const admin = result.rows[0];
 
         if (!admin) {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
         // Check if password matches
-        const isMatch = await admin.matchPassword(password);
+        const isMatch = await bcrypt.compare(password, admin.password);
 
         if (!isMatch) {
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -23,26 +25,26 @@ const loginAdmin = async (req, res) => {
         res.status(200).json({
             success: true,
             email: admin.email,
-            token: "fake-jwt-token-for-now" // In real app, generate real JWT here
+            token: "fake-jwt-token-for-now"
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// @desc    Seed admin if doesn't exist (for development/demo)
+// @desc    Seed admin if doesn't exist
 // @route   GET /api/admin/seed
 const seedAdmin = async (req, res) => {
     try {
-        const adminExists = await Admin.findOne({ email: 'admin@malarsilks.com' });
-        if (adminExists) {
+        const result = await pool.query('SELECT * FROM admins WHERE email = $1', ['malarsilkskarivalam@gmail.com']);
+        if (result.rowCount > 0) {
             return res.status(400).json({ success: false, message: 'Admin already exists' });
         }
 
-        await Admin.create({
-            email: 'admin@malarsilks.com',
-            password: 'admin123'
-        });
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash('Malarsilks@2006', salt);
+
+        await pool.query('INSERT INTO admins (email, password) VALUES ($1, $2)', ['malarsilkskarivalam@gmail.com', hashedPassword]);
 
         res.status(201).json({ success: true, message: 'Admin seeded successfully' });
     } catch (error) {
@@ -51,38 +53,36 @@ const seedAdmin = async (req, res) => {
 };
 
 // @desc    Get all admins
-// @route   GET /api/admin/all
 const getAdmins = async (req, res) => {
     try {
-        const admins = await Admin.find({}, '-password'); // Don't return passwords
-        res.status(200).json({ success: true, data: admins });
+        const result = await pool.query('SELECT id, email, created_at FROM admins');
+        res.status(200).json({ success: true, data: result.rows });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
 // @desc    Create a new admin
-// @route   POST /api/admin/create
 const createAdmin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const adminExists = await Admin.findOne({ email });
-        if (adminExists) {
+        const result = await pool.query('SELECT * FROM admins WHERE email = $1', [email]);
+        if (result.rowCount > 0) {
             return res.status(400).json({ success: false, message: 'Admin already exists' });
         }
 
-        const admin = await Admin.create({
-            email,
-            password
-        });
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newAdmin = await pool.query(
+            'INSERT INTO admins (email, password) VALUES ($1, $2) RETURNING id, email', 
+            [email, hashedPassword]
+        );
 
         res.status(201).json({
             success: true,
-            data: {
-                id: admin._id,
-                email: admin.email
-            }
+            data: newAdmin.rows[0]
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -90,21 +90,21 @@ const createAdmin = async (req, res) => {
 };
 
 // @desc    Delete an admin
-// @route   DELETE /api/admin/:id
 const deleteAdmin = async (req, res) => {
     try {
-        const admin = await Admin.findById(req.params.id);
+        const result = await pool.query('SELECT * FROM admins WHERE id = $1', [req.params.id]);
+        const admin = result.rows[0];
+
         if (!admin) {
             return res.status(404).json({ success: false, message: 'Admin not found' });
         }
 
-        // Prevent deleting the main admin for safety
-        if (admin.email === 'admin@malarsilks.com') {
-            return res.status(400).json({ success: false, message: 'Cannot delete the primary administrator' });
+        if (admin.email === 'malarsilkskarivalam@gmail.com') {
+            return res.status(400).json({ success: false, message: 'Cannot delete primary admin' });
         }
 
-        await admin.deleteOne();
-        res.status(200).json({ success: true, message: 'Admin removed successfully' });
+        await pool.query('DELETE FROM admins WHERE id = $1', [req.params.id]);
+        res.status(200).json({ success: true, message: 'Admin removed' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

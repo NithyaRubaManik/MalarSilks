@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ChevronLeft, MapPin, CreditCard, Loader2, Truck, CheckCircle2, Package } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { useToast } from '@/hooks/use-toast'
+import { CONFIG } from '@/lib/config'
 
 const inputClass = "w-full px-4 py-4 bg-white border-2 border-gray-200 hover:border-red-300 focus:border-red-500 focus:outline-none rounded-2xl text-sm font-semibold text-gray-800 placeholder:text-gray-400 transition-all duration-300 shadow-sm focus:shadow-red-100/50"
 const labelClass = "text-[11px] font-black uppercase tracking-[0.2em] text-gray-500 mb-2 block"
@@ -36,7 +37,7 @@ export default function CheckoutPage() {
       if (isLoggedIn && user?.email) {
         setLoadingProfile(true)
         try {
-          const res = await fetch(`https://malarsilksshoppingplatform.onrender.com/api/auth/profile/${user.email}`)
+          const res = await fetch(`${CONFIG.API.BASE_URL}/api/auth/profile/${user.email}`)
           const data = await res.json()
           if (data.success) {
             const u = data.data
@@ -108,7 +109,7 @@ export default function CheckoutPage() {
         totalPrice: total
       }
 
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/orders', {
+      const res = await fetch(CONFIG.API.ENDPOINTS.ORDERS, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)

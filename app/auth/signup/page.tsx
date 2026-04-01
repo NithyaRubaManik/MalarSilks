@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { User, Mail, Lock, Check } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
+import { CONFIG } from '@/lib/config'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -56,7 +57,7 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/auth/signup', {
+      const res = await fetch(CONFIG.API.ENDPOINTS.AUTH.SIGNUP, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, phone, address, city, pincode }),

@@ -4,12 +4,15 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Upload, User, Mail, Camera, Loader2, Image as ImageIcon, ArrowRight, Sparkles } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { CONFIG } from '@/lib/config'
 
 interface UserData {
+  id: string
   _id: string
   name: string
   email: string
   image: string
+  comment: string
   createdAt: string
 }
 
@@ -17,6 +20,7 @@ export default function GalleryPage() {
   const { toast } = useToast()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [comment, setComment] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [users, setUsers] = useState<UserData[]>([])
@@ -24,13 +28,7 @@ export default function GalleryPage() {
   const [fetching, setFetching] = useState(true)
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null)
 
-  const API_URL = 'https://malarsilksshoppingplatform.onrender.com/api'
-  const BASE_URL = 'https://malarsilksshoppingplatform.onrender.com'
-
-  const getFullImageUrl = (path: string) => {
-    if (!path) return '/placeholder.jpg'
-    return path.startsWith('http') ? path : `${BASE_URL}${path}`
-  }
+  const getFullImageUrl = (path: string) => CONFIG.IMAGES.getSecureImageUrl(path)
 
   useEffect(() => {
     fetchUsers()
@@ -38,7 +36,7 @@ export default function GalleryPage() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`${API_URL}/users`)
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/users`)
       const data = await res.json()
       if (data.success) setUsers(data.data)
     } catch (error) {
@@ -66,13 +64,14 @@ export default function GalleryPage() {
     const formData = new FormData()
     formData.append('name', name)
     formData.append('email', email)
+    formData.append('comment', comment)
     formData.append('image', file)
     try {
-      const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData })
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/upload`, { method: 'POST', body: formData })
       const data = await res.json()
       if (data.success) {
-        toast({ title: 'Uploaded!', description: 'Your photo has been added to the gallery.' })
-        setName(''); setEmail(''); setFile(null); setPreview(null)
+        toast({ title: 'Uploaded!', description: 'Your photo has been sent for admin approval.' })
+        setName(''); setEmail(''); setComment(''); setFile(null); setPreview(null)
         fetchUsers()
       } else throw new Error(data.message || 'Upload failed')
     } catch (error: any) {
@@ -143,6 +142,19 @@ export default function GalleryPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="hello@example.com"
                     className="w-full bg-gray-50 border-2 border-gray-200 hover:border-red-300 focus:border-red-500 py-4 px-5 rounded-2xl focus:bg-white transition-all outline-none text-sm font-semibold"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-500 flex items-center gap-2">
+                    Review / Comment
+                  </label>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Share your thoughts about our silks..."
+                    rows={3}
+                    className="w-full bg-gray-50 border-2 border-gray-200 hover:border-red-300 focus:border-red-500 py-4 px-5 rounded-2xl focus:bg-white transition-all outline-none text-sm font-semibold resize-none"
                   />
                 </div>
 
@@ -219,7 +231,7 @@ export default function GalleryPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {users.map((user, index) => (
                   <div
-                    key={user._id}
+                    key={user.id || user._id}
                     className="group bg-white rounded-3xl overflow-hidden shadow-xl shadow-gray-100/80 border border-gray-100 hover:border-red-100 hover:-translate-y-1 transition-all duration-500"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
@@ -245,7 +257,7 @@ export default function GalleryPage() {
                         </span>
                         <h4 className="font-serif font-bold text-gray-900 text-lg mt-2">{user.name}</h4>
                         <p className="text-[10px] text-gray-400 font-bold mt-0.5">
-                          {new Date(user.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                          {user.createdAt ? new Date(user.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : 'Recently Added'}
                         </p>
                       </div>
                      <div className="flex items-center gap-2">
@@ -313,12 +325,14 @@ export default function GalleryPage() {
                 </div>
 
                 <div className="p-6 rounded-2xl bg-orange-50/50 border border-orange-100 italic font-medium text-gray-600 text-sm leading-relaxed">
-                  &quot;Shared through the Malar Silks Studio Lookbook. Every thread tells a story of heritage and modern elegance.&quot;
+                  &quot;{selectedUser.comment || "No specific review shared, but the style speaks for itself!"}&quot;
                 </div>
               </div>
 
               <div className="pt-8 space-y-4">
-                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-300">Member Since {new Date(selectedUser.createdAt).toLocaleDateString()}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    Shared on {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : 'Recent Date'}
+                  </p>
                  <Link
                     href="/shop"
                     className="w-full py-5 bg-gradient-to-r from-red-600 to-red-700 text-white font-black text-sm uppercase tracking-[0.15em] rounded-2xl shadow-xl shadow-red-500/20 hover:shadow-red-500/40 hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3"

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Mail, User as UserIcon, Calendar, ArrowRight, Loader2 } from 'lucide-react'
+import { CONFIG } from '@/lib/config'
 
 interface UserData {
   _id: string
@@ -17,12 +18,11 @@ export default function UsersPage() {
   const [users, setUsers] = useState<UserData[]>([])
   const [loading, setLoading] = useState(true)
 
-  const BASE_URL = 'https://malarsilksshoppingplatform.onrender.com'
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/api/users`)
+        const res = await fetch(CONFIG.API.ENDPOINTS.USERS)
         const data = await res.json()
         if (data.success) {
           setUsers(data.data)
@@ -72,7 +72,7 @@ export default function UsersPage() {
             <Card key={user._id} className="group overflow-hidden rounded-2xl border-none shadow-soft hover:shadow-md transition-all">
               <div className="aspect-square relative overflow-hidden bg-muted">
                 <img
-                  src={user.image.startsWith('http') ? user.image : `${BASE_URL}${user.image}`}
+                  src={CONFIG.IMAGES.getSecureImageUrl(user.image)}
                   alt={user.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

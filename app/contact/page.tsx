@@ -187,7 +187,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="font-serif font-bold text-lg mb-2">Email</h4>
-                    <p className="text-muted-foreground">hello@malarsilks.com</p>
+                    <p className="text-muted-foreground">malarsilkskarivalam@gmail.com</p>
                     <p className="text-sm text-muted-foreground mt-1">
                       We respond within 24 hours
                     </p>
@@ -236,7 +236,7 @@ export default function ContactPage() {
                       </a>
                     </Button>
                     <Button variant="outline" size="sm" asChild>
-                      <a href="mailto:hello@malarsilks.com">
+                      <a href="mailto:malarsilkskarivalam@gmail.com">
                         <Mail className="w-4 h-4 mr-2" />
                         Email Us
                       </a>

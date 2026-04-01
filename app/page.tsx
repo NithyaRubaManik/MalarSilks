@@ -8,6 +8,7 @@ import { ProductCard } from '@/components/product-card'
 import { CATEGORIES, getFeaturedProducts } from '@/lib/products'
 import { useToast } from '@/hooks/use-toast'
 import AIOutfitAdvisor from '@/components/ai-outfit-advisor'
+import { CONFIG } from '@/lib/config'
 
 export default function Home() {
   const { toast } = useToast()
@@ -23,18 +24,23 @@ export default function Home() {
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [comment, setComment] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
 
   const fetchDbProducts = async () => {
     try {
-      const ping = await fetch('https://malarsilksshoppingplatform.onrender.com/api/products').catch(() => null);
+      const ping = await fetch(CONFIG.API.ENDPOINTS.PRODUCTS).catch(() => null);
       if (!ping) return;
       
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/products')
+      const res = await fetch(CONFIG.API.ENDPOINTS.PRODUCTS)
       const data = await res.json()
       if (data.success) {
-        setDbProducts(data.data.map((p: any) => ({ ...p, id: p._id })))
+        setDbProducts(data.data.map((p: any) => ({ 
+          ...p, 
+          id: p.id || p._id,
+          inStock: p.inStock ?? p.in_stock ?? true
+        })))
       }
     } catch (error) {
       console.error(error)
@@ -43,10 +49,10 @@ export default function Home() {
 
   const fetchPosts = async () => {
     try {
-      const ping = await fetch('https://malarsilksshoppingplatform.onrender.com/api/posts').catch(() => null);
+      const ping = await fetch(`${CONFIG.API.BASE_URL}/api/posts`).catch(() => null);
       if (!ping) return;
 
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/posts')
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/posts`)
       const data = await res.json()
       if (data.success) {
         setPosts(data.data)
@@ -72,16 +78,18 @@ export default function Home() {
     const formData = new FormData()
     formData.append('name', name)
     formData.append('email', email)
+    formData.append('comment', comment)
     formData.append('image', file)
 
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/upload', {
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/upload`, {
         method: 'POST',
         body: formData,
       })
       const data = await res.json()
       if (data.success) {
-        toast({ title: "Success", description: "Profile added to gallery!" })
+        toast({ title: "Success", description: "Your photo has been sent for admin approval!" })
+        setName(''); setEmail(''); setComment(''); setFile(null)
         router.push('/gallery')
       }
     } catch (error) {
@@ -351,7 +359,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               {posts.map((post) => (
-                <div key={post._id} className="group cursor-pointer">
+                <div key={post.id || post._id} className="group cursor-pointer">
                   <div className="rounded-[2.5rem] overflow-hidden mb-8 h-80 relative">
                     <img 
                       src={post.imageUrl} 
@@ -427,9 +435,21 @@ export default function Home() {
                       value={email} 
                       onChange={(e) => setEmail(e.target.value)} 
                       placeholder="hello@style.com" 
-                      className="w-full bg-gray-50 border-transparent py-4 px-6 rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-hidden"
+                      className="w-full bg-gray-50 border-transparent py-4 px-6 rounded-2xl focus:bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-hidden text-sm font-semibold"
                     />
                   </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Review / Comment</label>
+                  <textarea 
+                    suppressHydrationWarning
+                    value={comment} 
+                    onChange={(e) => setComment(e.target.value)} 
+                    placeholder="Share your thoughts about our silks..." 
+                    rows={3}
+                    className="w-full bg-gray-50 border-transparent py-4 px-6 rounded-[2rem] focus:bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-hidden text-sm font-semibold resize-none"
+                  />
                 </div>
 
                 <div className="space-y-3">

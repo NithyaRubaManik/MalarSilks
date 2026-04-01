@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Heart, ShoppingCart, Star, CheckCircle2, Eye } from 'lucide-react'
 import { Product, useApp } from '@/lib/app-context'
 import { cn } from '@/lib/utils'
+import { CONFIG } from '@/lib/config'
 import { useState } from 'react'
 
 interface ProductCardProps {
@@ -35,7 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="relative aspect-[3/4] bg-gradient-to-br from-orange-50 to-red-50 overflow-hidden">
         <Link href={`/product/${product.id}`} className="block w-full h-full">
           <img
-            src={product.image.startsWith('http') ? product.image : `https://malarsilksshoppingplatform.onrender.com${product.image}`}
+            src={CONFIG.IMAGES.getSecureImageUrl(product.image)}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
@@ -80,7 +81,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Rating pill – top right */}
         <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
           <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-          <span className="text-[11px] font-black text-gray-700">{product.rating.toFixed(1)}</span>
+          <span className="text-[11px] font-black text-gray-700">{(product.rating || 5.0).toFixed(1)}</span>
         </div>
       </div>
 

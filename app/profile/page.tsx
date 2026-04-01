@@ -11,8 +11,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { User, Package, MapPin, Phone, Mail, Loader2, ChevronRight, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
+import { CONFIG } from '@/lib/config'
 
 interface Order {
+  id: string
   _id: string
   totalPrice: number
   status: string
@@ -37,7 +39,6 @@ export default function ProfilePage() {
     password: ''
   })
 
-  const API_URL = 'https://malarsilksshoppingplatform.onrender.com/api'
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -48,7 +49,7 @@ export default function ProfilePage() {
     const fetchData = async () => {
       try {
         // Fetch full profile details
-        const profileRes = await fetch(`${API_URL}/auth/profile/${user?.email}`)
+        const profileRes = await fetch(`${CONFIG.API.BASE_URL}/api/auth/profile/${user?.email}`)
         const profileData = await profileRes.json()
         
         if (profileData.success) {
@@ -71,10 +72,10 @@ export default function ProfilePage() {
         }
 
         // Fetch orders
-        const ordersRes = await fetch(`${API_URL}/orders/myorders/${profileData.data._id}`)
+        const ordersRes = await fetch(`${CONFIG.API.BASE_URL}/api/orders/myorders/${profileData.data._id}`)
         const ordersData = await ordersRes.json()
         if (ordersData.success) {
-          setOrders(ordersData.data)
+          setOrders(ordersData.data.map((o: any) => ({ ...o, id: o.id || o._id })))
         }
       } catch (error) {
         console.error("Error fetching profile data:", error)
@@ -91,7 +92,7 @@ export default function ProfilePage() {
     setUpdating(true)
 
     try {
-      const res = await fetch(`${API_URL}/auth/profile`, {
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/auth/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -267,7 +268,7 @@ export default function ProfilePage() {
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b pb-4">
                         <div>
                           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Order ID</p>
-                          <p className="font-mono text-sm text-slate-700">#{order._id.substring(0, 8)}...</p>
+                          <p className="font-mono text-sm text-slate-700">#{String(order.id || order._id || '').substring(0, 8)}...</p>
                         </div>
                         <div>
                           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Date</p>
@@ -293,7 +294,7 @@ export default function ProfilePage() {
                           <div key={idx} className="flex items-center gap-4">
                             <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border bg-slate-50">
                               <img 
-                                src={item.image.startsWith('http') ? item.image : `https://malarsilksshoppingplatform.onrender.com${item.image}`} 
+                                src={CONFIG.IMAGES.getSecureImageUrl(item.image)} 
                                 alt={item.name} 
                                 className="w-full h-full object-cover"
                               />

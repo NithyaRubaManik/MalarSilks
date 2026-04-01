@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
 import { Plus, Edit, Trash2, Package, Users, ShoppingCart, BarChart3, LogOut, Upload, X, Mail, ShieldCheck, FileText } from 'lucide-react'
+import { CONFIG } from '@/lib/config'
 
 interface Post {
   _id: string
@@ -19,14 +20,19 @@ interface Post {
   description: string
   imageUrl: string
   createdAt: string
+  created_at?: string
 }
 
 interface GalleryEntry {
+  id: string
   _id: string
   name: string
   email: string
   image: string
+  comment: string
+  is_approved: boolean
   createdAt: string
+  created_at?: string
 }
 
 interface Product {
@@ -50,6 +56,7 @@ interface RegisteredUser {
   city?: string
   pincode?: string
   createdAt: string
+  created_at?: string
 }
 
 interface AdminUser {
@@ -57,6 +64,7 @@ interface AdminUser {
   id?: string
   email: string
   createdAt: string
+  created_at?: string
 }
 
 export default function AdminPage() {
@@ -124,7 +132,7 @@ export default function AdminPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/products')
+      const res = await fetch(CONFIG.API.ENDPOINTS.PRODUCTS)
       const data = await res.json()
       if (data.success) {
         setProducts(data.data.map((p: any) => ({ ...p, id: p._id || p.id })))
@@ -136,7 +144,7 @@ export default function AdminPage() {
 
   const fetchRegisteredUsers = async () => {
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/auth/users')
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/auth/users`)
       const data = await res.json()
       if (data.success) {
         setRegisteredUsers(data.data.map((u: any) => ({ ...u, id: u._id || u.id })))
@@ -148,7 +156,7 @@ export default function AdminPage() {
 
   const fetchStaff = async () => {
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/admin/all')
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/admin/all`)
       const data = await res.json()
       if (data.success) {
         setStaffList(data.data.map((s: any) => ({ ...s, id: s._id || s.id })))
@@ -160,7 +168,7 @@ export default function AdminPage() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/orders')
+      const res = await fetch(CONFIG.API.ENDPOINTS.ORDERS)
       const data = await res.json()
       if (data.success) {
         setOrders(data.data.map((o: any) => ({ ...o, id: o._id || o.id })))
@@ -172,7 +180,7 @@ export default function AdminPage() {
 
   const fetchPosts = async () => {
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/posts')
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/posts`)
       const data = await res.json()
       if (data.success) {
         setPosts(data.data)
@@ -184,20 +192,37 @@ export default function AdminPage() {
 
   const fetchGallery = async () => {
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/users')
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/submissions`)
       const data = await res.json()
       if (data.success) {
-        setGalleryItems(data.data)
+        setGalleryItems(data.data.map((item: any) => ({ ...item, id: item.id || item._id })))
       }
     } catch (error) {
       console.error('Error fetching gallery:', error)
     }
   }
 
+  const handleToggleGalleryApproval = async (id: string, currentStatus: boolean) => {
+    try {
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/submissions/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_approved: !currentStatus })
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast({ title: "Updated", description: !currentStatus ? "Entry approved!" : "Entry hidden." })
+        fetchGallery()
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Operation failed", variant: "destructive" })
+    }
+  }
+
   const handleDeleteGalleryItem = async (id: string) => {
     if (!confirm('Are you sure you want to remove this gallery entry?')) return
     try {
-      const res = await fetch(`https://malarsilksshoppingplatform.onrender.com/api/users/${id}`, { method: 'DELETE' })
+      const res = await fetch(`${CONFIG.API.ENDPOINTS.USERS}/${id}`, { method: 'DELETE' })
       const data = await res.json()
       if (data.success) {
         toast({ title: "Success", description: "Gallery entry removed" })
@@ -211,7 +236,7 @@ export default function AdminPage() {
   const handleCreateAdmin = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/admin/create', {
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/admin/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAdmin)
@@ -230,7 +255,7 @@ export default function AdminPage() {
   }
 
   const handleDeleteAdmin = async (id: string, email: string) => {
-    if (email === 'admin@malarsilks.com') {
+    if (email === 'malarsilkskarivalam@gmail.com') {
       toast({ title: "Restricted", description: "Cannot delete primary administrator", variant: "destructive" })
       return
     }
@@ -238,7 +263,7 @@ export default function AdminPage() {
     if (!confirm('Are you sure you want to remove this admin?')) return
 
     try {
-      const res = await fetch(`https://malarsilksshoppingplatform.onrender.com/api/admin/${id}`, { method: 'DELETE' })
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/admin/${id}`, { method: 'DELETE' })
       const data = await res.json()
       if (data.success) {
         toast({ title: "Success", description: "Admin removed" })
@@ -246,6 +271,20 @@ export default function AdminPage() {
       }
     } catch (error) {
       toast({ title: "Error", description: "Failed to delete admin", variant: "destructive" })
+    }
+  }
+
+  const handleDeleteOrder = async (id: string) => {
+    if (!confirm('Are you sure you want to PERMANENTLY delete this order and its records?')) return
+    try {
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/orders/${id}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (data.success) {
+        toast({ title: "Success", description: "Order deleted successfully" })
+        fetchOrders()
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete order", variant: "destructive" })
     }
   }
 
@@ -291,7 +330,7 @@ export default function AdminPage() {
     formData.append('image', selectedFile)
 
     try {
-      const res = await fetch('https://malarsilksshoppingplatform.onrender.com/api/products', {
+      const res = await fetch(CONFIG.API.ENDPOINTS.PRODUCTS, {
         method: 'POST',
         body: formData,
       })
@@ -324,7 +363,7 @@ export default function AdminPage() {
     if (selectedFile) formData.append('image', selectedFile)
 
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${editingProductId}`, {
+      const res = await fetch(`${CONFIG.API.ENDPOINTS.PRODUCTS}/${editingProductId}`, {
         method: 'PUT',
         body: formData,
       })
@@ -359,7 +398,7 @@ export default function AdminPage() {
 
   const handleDeleteProduct = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const res = await fetch(`${CONFIG.API.ENDPOINTS.PRODUCTS}/${id}`, {
         method: 'DELETE',
       })
       const data = await res.json()
@@ -397,7 +436,7 @@ export default function AdminPage() {
   const stats = {
     totalProducts: products.length,
     totalOrders: orders.length,
-    totalRevenue: orders.filter(o => o.status !== 'Cancelled').reduce((sum, order) => sum + (order.totalPrice || 0), 0),
+    totalRevenue: orders.filter(o => o.status !== 'Cancelled').reduce((sum, order) => sum + (Number(order.totalPrice || order.total_price || 0)), 0),
     totalCustomers: registeredUsers.length,
     totalStaff: staffList.length,
     totalGallery: galleryItems.length,
@@ -436,7 +475,6 @@ export default function AdminPage() {
             <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="customers">Customers</TabsTrigger>
             <TabsTrigger value="staff">Staff</TabsTrigger>
-            <TabsTrigger value="posts">Posts</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
           </TabsList>
 
@@ -516,13 +554,13 @@ export default function AdminPage() {
                     <p className="text-center py-4 text-muted-foreground">No recent orders.</p>
                   ) : (
                     orders.slice(0, 5).map((order) => (
-                      <div key={order._id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div key={order.id || order._id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div>
-                          <p className="font-medium">{order._id.substring(order._id.length - 8).toUpperCase()}</p>
+                          <p className="font-medium">{String(order.id || order._id || '').substring(0, 8).toUpperCase()}</p>
                           <p className="text-sm text-muted-foreground">{order.user?.name || 'Guest'}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">₹{order.totalPrice.toLocaleString()}</p>
+                          <p className="font-medium">₹{(order.totalPrice || order.total_price || 0).toLocaleString()}</p>
                           <Badge variant={order.status === 'Delivered' ? 'default' : 'secondary'}>
                             {order.status}
                           </Badge>
@@ -750,24 +788,24 @@ export default function AdminPage() {
                     </div>
                   ) : (
                     orders.map((order) => (
-                      <div key={order.id} className="p-4 border rounded-xl hover:bg-accent/5 transition-colors">
+                      <div key={order.id || order._id} className={`p-4 border rounded-xl hover:bg-accent/5 transition-colors relative overflow-hidden ${order.status === 'Cancelled' ? 'opacity-60' : ''}`}>
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                          <div>
-                            <p className="font-bold text-lg">{order._id.substring(order._id.length - 8).toUpperCase()}</p>
+                          <div className={order.status === 'Cancelled' ? 'line-through decoration-gray-500 decoration-2' : ''}>
+                            <p className="font-bold text-lg">{String(order.id || order._id || '').substring(0, 8).toUpperCase()}</p>
                             <p className="text-sm text-muted-foreground">
-                              {order.user?.name || 'Guest'} • {new Date(order.createdAt).toLocaleDateString()}
+                              {order.user?.name || 'Guest'} • {order.createdAt || (order as any).created_at ? new Date((order.createdAt || (order as any).created_at) as string).toLocaleDateString() : 'Recent'}
                             </p>
                             <p className="text-xs mt-1 italic text-muted-foreground">
-                              {order.orderItems.length} items • {order.shippingAddress.city}
+                              {order.orderItems?.length || 0} items • {order.shippingAddress?.city || 'No City'}
                             </p>
                           </div>
                           <div className="flex flex-wrap items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                            <p className="font-bold text-primary">₹{order.totalPrice.toLocaleString()}</p>
+                            <p className="font-bold text-primary">₹{(order.totalPrice || order.total_price || 0).toLocaleString()}</p>
                             <Badge 
-                              variant={
-                                order.status === 'Delivered' ? 'default' : 
-                                order.status === 'Pending' ? 'secondary' : 
-                                order.status === 'Cancelled' ? 'destructive' : 'outline'
+                              className={
+                                order.status === 'Delivered' ? 'bg-green-500 hover:bg-green-600 text-white' : 
+                                order.status === 'Cancelled' ? 'bg-gray-400 hover:bg-gray-500 text-white' : 
+                                'bg-red-500 hover:bg-red-600 text-white'
                               }
                             >
                               {order.status}
@@ -775,7 +813,7 @@ export default function AdminPage() {
                             
                             <Select 
                               onValueChange={(val) => {
-                                fetch(`http://localhost:5000/api/orders/${order._id}/status`, {
+                                fetch(`${CONFIG.API.BASE_URL}/api/orders/${order.id || order._id}/status`, {
                                   method: 'PUT',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ status: val })
@@ -799,6 +837,15 @@ export default function AdminPage() {
                                 <SelectItem value="Cancelled">Cancelled</SelectItem>
                               </SelectContent>
                             </Select>
+
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg h-8 w-8"
+                              onClick={() => handleDeleteOrder(order.id || order._id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -851,7 +898,9 @@ export default function AdminPage() {
                           </div>
                           <div className="text-right flex flex-col justify-end">
                             <p className="text-xs text-muted-foreground">Registered on</p>
-                            <p className="text-sm font-medium">{new Date(user.createdAt).toLocaleDateString()}</p>
+                            <p className="text-sm font-medium">
+                              {user.createdAt || user.created_at ? new Date((user.createdAt || user.created_at) as string).toLocaleDateString() : 'Recent'}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -924,7 +973,7 @@ export default function AdminPage() {
                             <p className="font-bold text-foreground">{admin.email}</p>
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
                               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                              Active Member • Added {new Date(admin.createdAt).toLocaleDateString()}
+                              Active Member • Added {admin.createdAt || admin.created_at ? new Date((admin.createdAt || admin.created_at) as string).toLocaleDateString() : 'Recent'}
                             </p>
                           </div>
                         </div>
@@ -950,180 +999,6 @@ export default function AdminPage() {
             </div>
           </TabsContent>
 
-          {/* Posts Tab */}
-          <TabsContent value="posts" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Manage Posts</h2>
-              <Button 
-                className="flex items-center gap-2" 
-                size="lg"
-                onClick={() => setShowAddPostForm(!showAddPostForm)}
-              >
-                <Plus className="w-5 h-5" />
-                Add New Post
-              </Button>
-            </div>
-
-            {/* Add Post Form */}
-            {showAddPostForm && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    Create New Post
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <Label htmlFor="post-title">Post Title *</Label>
-                      <Input
-                        id="post-title"
-                        value={newPost.title}
-                        onChange={(e) => setNewPost({...newPost, title: e.target.value})}
-                        placeholder="Enter post title"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="post-image">Post Image *</Label>
-                      <div className="mt-2 space-y-3">
-                        <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                          <input
-                            id="post-image"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className="hidden"
-                          />
-                          <label htmlFor="post-image" className="cursor-pointer flex flex-col items-center gap-2">
-                            <Upload className="w-8 h-8 text-muted-foreground" />
-                            <div>
-                              <p className="font-medium">Click to upload post image</p>
-                              <p className="text-sm text-muted-foreground">PNG, JPG, GIF up to 5MB</p>
-                            </div>
-                          </label>
-                        </div>
-                        {imagePreview && (
-                          <div className="relative inline-block">
-                            <img
-                              src={imagePreview}
-                              alt="Post Preview"
-                              className="w-full max-w-sm h-48 object-cover rounded-lg"
-                            />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              className="absolute top-2 right-2"
-                              onClick={clearImage}
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="post-desc">Description *</Label>
-                      <Textarea
-                        id="post-desc"
-                        value={newPost.description}
-                        onChange={(e) => setNewPost({...newPost, description: e.target.value})}
-                        placeholder="Enter post description"
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex gap-4 mt-6">
-                    <Button 
-                      onClick={async () => {
-                        if (!newPost.title || !newPost.description || !selectedFile) {
-                          toast({ title: "Error", description: "Please fill in all fields and provide an image.", variant: "destructive" });
-                          return;
-                        }
-                        const formData = new FormData();
-                        formData.append('title', newPost.title);
-                        formData.append('description', newPost.description);
-                        formData.append('image', selectedFile);
-
-                        try {
-                          const res = await fetch('http://localhost:5000/api/posts', {
-                            method: 'POST',
-                            body: formData
-                          });
-                          const data = await res.json();
-                          if (data.success) {
-                            toast({ title: "Success", description: "Post added successfully!" });
-                            fetchPosts();
-                            setShowAddPostForm(false);
-                            setNewPost({ title: '', description: '' });
-                            clearImage();
-                          }
-                        } catch (err) {
-                          toast({ title: "Error", description: "Failed to add post", variant: "destructive" });
-                        }
-                      }} 
-                      size="lg" 
-                    >
-                      Publish Post
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Posts List */}
-            <Card>
-              <CardHeader>
-                <CardTitle>All Posts</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {posts.length === 0 ? (
-                    <p className="text-center py-4 text-muted-foreground">No posts created yet.</p>
-                  ) : (
-                    posts.map(post => (
-                      <div key={post._id} className="flex flex-col md:flex-row gap-4 p-4 border rounded-xl hover:bg-accent/5">
-                        <img 
-                          src={post.imageUrl} 
-                          alt={post.title} 
-                          className="w-full md:w-32 h-32 object-cover rounded-lg" 
-                          onError={(e) => e.currentTarget.src = '/placeholder.jpg'}
-                        />
-                        <div className="flex-1 space-y-2">
-                          <h3 className="text-lg font-bold">{post.title}</h3>
-                          <p className="text-sm text-muted-foreground line-clamp-2">{post.description}</p>
-                          <p className="text-xs text-muted-foreground border-t pt-2 w-max">
-                            Created: {new Date(post.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            onClick={async () => {
-                              if (!confirm('Are you sure you want to delete this post?')) return;
-                              try {
-                                const res = await fetch(`http://localhost:5000/api/posts/${post._id}`, { method: 'DELETE' });
-                                if (res.ok) {
-                                  toast({ title: 'Deleted', description: 'Post deleted successfully' });
-                                  fetchPosts();
-                                }
-                              } catch(e) {
-                                toast({ title: 'Error', description: 'Failed to delete', variant: 'destructive' });
-                              }
-                            }}
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
           {/* Gallery Tab */}
           <TabsContent value="gallery" className="space-y-6">
             <div className="flex items-center justify-between">
@@ -1143,31 +1018,55 @@ export default function AdminPage() {
                     </p>
                   ) : (
                     galleryItems.map((item) => (
-                      <div key={item._id} className="group relative bg-accent/5 rounded-2xl overflow-hidden border hover:border-primary/30 transition-all">
-                        <div className="aspect-square relative">
+                      <div key={item.id} className="group relative bg-accent/5 rounded-2xl overflow-hidden border hover:border-primary/30 transition-all flex flex-col">
+                        <div className="aspect-[4/5] relative">
                           <img 
-                            src={item.image} 
+                            src={CONFIG.IMAGES.getSecureImageUrl(item.image)} 
                             alt={item.name} 
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                             onError={(e) => e.currentTarget.src = '/placeholder.jpg'}
                           />
-                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Button
                               variant="destructive"
                               size="icon"
-                              className="h-8 w-8 rounded-full shadow-lg"
-                              onClick={() => handleDeleteGalleryItem(item._id)}
+                              className="h-9 w-9 rounded-full shadow-xl"
+                              onClick={() => handleDeleteGalleryItem(item.id)}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-5 h-5" />
                             </Button>
                           </div>
+                          <div className="absolute bottom-3 left-3">
+                            <Badge variant={item.is_approved ? "default" : "secondary"} className={item.is_approved ? "bg-green-600" : "bg-orange-500"}>
+                              {item.is_approved ? "Visible" : "Pending Approval"}
+                            </Badge>
+                          </div>
                         </div>
-                        <div className="p-4 space-y-1">
-                          <p className="font-bold text-foreground truncate">{item.name}</p>
-                          <p className="text-xs text-muted-foreground truncate">{item.email}</p>
-                          <p className="text-[10px] text-muted-foreground pt-2 border-t mt-2">
-                            Submitted: {new Date(item.createdAt).toLocaleDateString()}
-                          </p>
+                        <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                               <p className="font-black text-foreground truncate">{item.name}</p>
+                               <span className="text-[9px] font-bold text-muted-foreground">{item.createdAt || item.created_at ? new Date((item.createdAt || item.created_at) as string).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : 'New'}</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground truncate mb-3 flex items-center gap-1">
+                               <Mail className="w-3 h-3" /> {item.email}
+                            </p>
+                            
+                             <div className="bg-white/50 border border-gray-100 p-3 rounded-xl italic text-xs text-muted-foreground line-clamp-3">
+                                &quot;{item.comment || "No specific review shared."}&quot;
+                             </div>
+                          </div>
+
+                          <div className="pt-4 flex gap-2">
+                             <Button 
+                                variant={item.is_approved ? "outline" : "default"}
+                                size="sm"
+                                className={`flex-1 font-bold ${!item.is_approved ? "bg-green-600 hover:bg-green-700 shadow-lg shadow-green-500/20" : ""}`}
+                                onClick={() => handleToggleGalleryApproval(item.id, item.is_approved)}
+                             >
+                                {item.is_approved ? "Reject/Hide" : "Approve Submission"}
+                             </Button>
+                          </div>
                         </div>
                       </div>
                     ))
