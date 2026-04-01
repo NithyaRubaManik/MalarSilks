@@ -1,4 +1,4 @@
-const http = require('http');
+const https = require('https');
 
 const data = JSON.stringify({
     name: 'Jamunadevi',
@@ -11,8 +11,8 @@ const data = JSON.stringify({
 });
 
 const options = {
-    hostname: 'localhost',
-    port: 5000,
+    hostname: 'malarsilks-1.onrender.com',
+    port: 443,
     path: '/api/auth/signup',
     method: 'POST',
     headers: {
@@ -21,7 +21,7 @@ const options = {
     }
 };
 
-const req = http.request(options, (res) => {
+const req = https.request(options, (res) => {
     console.log(`STATUS: ${res.statusCode}`);
     let body = '';
     res.on('data', (chunk) => body += chunk);

@@ -1,13 +1,13 @@
-const http = require('http');
+const https = require('https');
 
 async function check() {
   const options = {
-    hostname: 'localhost',
-    port: 5000,
+    hostname: 'malarsilks-1.onrender.com',
+    port: 443,
     path: '/api/users',
     method: 'GET'
   };
-  const req = http.request(options, (res) => {
+  const req = https.request(options, (res) => {
     let data = '';
     res.on('data', (ch) => { data += ch; });
     res.on('end', () => {

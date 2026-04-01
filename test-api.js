@@ -1,6 +1,6 @@
-const http = require('http');
+const https = require('https');
 
-http.get('http://localhost:5000/api/products', (res) => {
+https.get('https://malarsilks-1.onrender.com/api/products', (res) => {
   let data = '';
   res.on('data', (chunk) => {
     data += chunk;
