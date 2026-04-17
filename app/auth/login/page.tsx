@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,9 +14,10 @@ import { useToast } from '@/hooks/use-toast'
 import { useApp } from '@/lib/app-context'
 import { CONFIG } from '@/lib/config'
 
-export default function LoginPage() {
+function LoginContent() {
   const { toast } = useToast()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { login, isLoggedIn, user: contextUser } = useApp()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -61,7 +63,14 @@ export default function LoginPage() {
         })
 
         if (data.role === 'admin') router.push('/admin')
-        else router.push('/')
+        else {
+          const redirect = searchParams.get('redirect')
+          if (redirect) {
+            router.push(redirect)
+          } else {
+            router.push('/')
+          }
+        }
       } else {
         setError(data.message || 'Invalid email or password.')
         setIsLoading(false)
@@ -167,7 +176,7 @@ export default function LoginPage() {
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Don't have an account?{' '}
-                <Link href="/auth/signup" className="text-primary hover:underline font-semibold">
+                <Link href={`/auth/signup${searchParams.get('redirect') ? `?redirect=${searchParams.get('redirect')}` : ''}`} className="text-primary hover:underline font-semibold">
                   Sign up here
                 </Link>
               </p>
@@ -186,5 +195,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center p-4">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   )
 }

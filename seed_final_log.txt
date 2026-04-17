@@ -1,0 +1,92 @@
+﻿node.exe : C:\Users\nith
+y\Downloads\Malar-silks-
+5.0\node_modules\@prisma
+\client\src\runtime\getP
+rismaClient.ts:320
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" "
+C:\Users\nithy\AppData\R
+oaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo      
+        : NotSpecified  
+  : (C:\Users\nithy\.   
+ ..maClient.ts:320:S    
+tring) [], RemoteEx    
+ception
+    + FullyQualifiedErr 
+   orId : NativeComman  
+  dError
+ 
+        throw new Prisma
+ClientInitializationErro
+r(
+              ^
+PrismaClientInitializati
+onError: `PrismaClient` 
+needs to be constructed 
+with a non-empty, valid 
+`PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at new t (C:\Users\n
+ithy\Downloads\Malar-sil
+ks-5.0\node_modules\@pri
+sma\client\src\runtime\g
+etPrismaClient.ts:320:15
+)
+    at 
+Object.<anonymous> (C:\U
+sers\nithy\Downloads\Mal
+ar-silks-5.0\prisma\seed
+.ts:4:16)
+    at Module._compile (
+node:internal/modules/cj
+s/loader:1706:14)
+    at 
+Module.m._compile (C:\Us
+ers\nithy\Downloads\Mala
+r-silks-5.0\node_modules
+\ts-node\src\index.ts:16
+18:23)
+    at node:internal/mod
+ules/cjs/loader:1839:10
+    at Object.require.ex
+tensions.<computed> [as 
+.ts] (C:\Users\nithy\Dow
+nloads\Malar-silks-5.0\n
+ode_modules\ts-node\src\
+index.ts:1621:12)
+    at Module.load (node
+:internal/modules/cjs/lo
+ader:1441:32)
+    at Function._load (n
+ode:internal/modules/cjs
+/loader:1263:12)
+    at TracingChannel.tr
+aceSync (node:diagnostic
+s_channel:322:14)
+    at wrapModuleLoad (n
+ode:internal/modules/cjs
+/loader:237:24) {
+  clientVersion: 
+'7.5.0',
+  errorCode: undefined,
+  retryable: undefined
+}

@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
-import { Plus, Edit, Trash2, Package, Users, ShoppingCart, BarChart3, LogOut, Upload, X, Mail, ShieldCheck, FileText } from 'lucide-react'
+import { Plus, Edit, Trash2, Package, Users, ShoppingCart, BarChart3, LogOut, Upload, X, Mail, ShieldCheck, FileText, Image as ImageIcon } from 'lucide-react'
 import { CONFIG } from '@/lib/config'
 
 interface Post {
@@ -123,6 +123,7 @@ export default function AdminPage() {
     localStorage.removeItem('adminAuth')
     localStorage.removeItem('userRole')
     localStorage.removeItem('userEmail')
+    localStorage.removeItem('adminToken')
     toast({
       title: "Logged Out",
       description: "You have been logged out successfully.",
@@ -195,7 +196,10 @@ export default function AdminPage() {
 
   const fetchGallery = async () => {
     try {
-      const res = await fetch(`${CONFIG.API.BASE_URL}/api/submissions`)
+      const token = localStorage.getItem('adminToken')
+      const res = await fetch(`${CONFIG.API.BASE_URL}/api/submissions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       const data = await res.json()
       if (data.success) {
         setGalleryItems(data.data.map((item: any) => ({ ...item, id: item.id || item._id })))
@@ -510,7 +514,7 @@ export default function AdminPage() {
           {/* Dashboard Tab */}
           <TabsContent value="dashboard" className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
@@ -566,6 +570,18 @@ export default function AdminPage() {
                     <div>
                       <p className="text-2xl font-bold">{stats.totalStaff}</p>
                       <p className="text-muted-foreground text-sm">Admin Staff</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <ImageIcon className="w-8 h-8 text-primary" />
+                    <div>
+                      <p className="text-2xl font-bold">{stats.totalGallery}</p>
+                      <p className="text-muted-foreground text-sm">Gallery Entries</p>
                     </div>
                   </div>
                 </CardContent>
@@ -817,7 +833,11 @@ export default function AdminPage() {
                     </div>
                   ) : (
                     orders.map((order) => (
-                      <div key={order.id || order._id} className={`p-4 border rounded-xl hover:bg-accent/5 transition-colors relative overflow-hidden ${order.status === 'Cancelled' ? 'opacity-60' : ''}`}>
+                      <div key={order.id || order._id} className={`p-4 border rounded-xl hover:bg-accent/5 transition-colors relative overflow-hidden ${
+                        order.status === 'Cancelled' ? 'opacity-60' : 
+                        order.status === 'Delivered' ? 'bg-green-50 border-green-200' : 
+                        ''
+                      }`}>
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                           <div className={order.status === 'Cancelled' ? 'line-through decoration-gray-500 decoration-2' : ''}>
                             <p className="font-bold text-lg">{String(order.id || order._id || '').substring(0, 8).toUpperCase()}</p>

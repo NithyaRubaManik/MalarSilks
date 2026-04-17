@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "arumugam",
+    "email": "arumugam@gmail.com",
+    "image": "https://res.cloudinary.com/diz2mltv0/image/upload/v1775461245/malar_silks_products/oslzlm0cp5xr1u3o2ano.jpg",
+    "comment": "this product is very good",
+    "is_approved": false,
+    "created_at": "2026-04-06T07:40:46.427Z"
+  },
+  {
+    "id": 2,
+    "name": "arumugam",
+    "email": "arumugam@gmail.com",
+    "image": "https://res.cloudinary.com/diz2mltv0/image/upload/v1775480145/malar_silks_products/c8xzj4hlvkq52c7yxd22.jpg",
+    "comment": "it is good",
+    "is_approved": false,
+    "created_at": "2026-04-06T12:55:46.563Z"
+  }
+]

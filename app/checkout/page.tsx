@@ -17,6 +17,22 @@ export default function CheckoutPage() {
   const { cart, clearCart, user, isLoggedIn } = useApp()
   const [step, setStep] = useState<'address' | 'payment'>('address')
   const [loadingProfile, setLoadingProfile] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (isClient && !isLoggedIn) {
+      toast({ 
+        title: "Login Required", 
+        description: "Please login to access checkout.",
+        variant: "destructive"
+      })
+      router.push('/auth/login?redirect=/checkout')
+    }
+  }, [isClient, isLoggedIn, router, toast])
 
   const [address, setAddress] = useState({
     fullName: '',
@@ -63,6 +79,14 @@ export default function CheckoutPage() {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const tax = Math.round(subtotal * 0.1)
   const total = subtotal + tax
+
+  if (!isClient || !isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50/20 to-amber-50/30 flex items-center justify-center pt-20">
+        <Loader2 className="w-10 h-10 animate-spin text-red-500" />
+      </div>
+    )
+  }
 
   if (cart.length === 0) {
     return (

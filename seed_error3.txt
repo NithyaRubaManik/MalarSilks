@@ -1,0 +1,73 @@
+﻿node.exe : C:\Users\nith
+y\Downloads\Malar-silks-
+5.0\node_modules\@prisma
+\client\src\runtime\getP
+rismaClient.ts:320
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" "
+C:\Users\nithy\AppData\R
+oaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo      
+        : NotSpecified  
+  : (C:\Users\nithy\.   
+ ..maClient.ts:320:S    
+tring) [], RemoteEx    
+ception
+    + FullyQualifiedErr 
+   orId : NativeComman  
+  dError
+ 
+        throw new Prisma
+ClientInitializationErro
+r(
+              ^
+PrismaClientInitializati
+onError: `PrismaClient` 
+needs to be constructed 
+with a non-empty, valid 
+`PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at new t (C:\Users\n
+ithy\Downloads\Malar-sil
+ks-5.0\node_modules\@pri
+sma\client\src\runtime\g
+etPrismaClient.ts:320:15
+)
+    at file:///C:/Users/
+nithy/Downloads/Malar-si
+lks-5.0/prisma/seed.ts:4
+:16
+    at ModuleJob.run (no
+de:internal/modules/esm/
+module_job:345:25)
+    at async onImport.tr
+acePromise.__proto__ (no
+de:internal/modules/esm/
+loader:651:26)
+    at async asyncRunEnt
+ryPointWithESMLoader (no
+de:internal/modules/run_
+main:117:5) {
+  clientVersion: 
+'7.5.0',
+  errorCode: undefined,
+  retryable: undefined
+}

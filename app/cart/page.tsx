@@ -5,7 +5,7 @@ import { Trash2, Plus, Minus, ShoppingCart, ArrowLeft, ShoppingBag } from 'lucid
 import { useApp } from '@/lib/app-context'
 
 export default function CartPage() {
-  const { cart, removeFromCart, updateCartQuantity, clearCart } = useApp()
+  const { cart, removeFromCart, updateCartQuantity, clearCart, isLoggedIn } = useApp()
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const tax = Math.round(subtotal * 0.1)
@@ -187,12 +187,21 @@ export default function CartPage() {
                 </div>
 
                 {/* CTA */}
-                <Link
-                  href="/checkout"
-                  className="block w-full py-5 text-center bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white font-black text-sm uppercase tracking-[0.15em] rounded-2xl shadow-2xl shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-1 active:translate-y-0 transition-all duration-300"
-                >
-                  🛒 Proceed to Checkout
-                </Link>
+                {isLoggedIn ? (
+                  <Link
+                    href="/checkout"
+                    className="block w-full py-5 text-center bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white font-black text-sm uppercase tracking-[0.15em] rounded-2xl shadow-2xl shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-1 active:translate-y-0 transition-all duration-300"
+                  >
+                    🛒 Proceed to Checkout
+                  </Link>
+                ) : (
+                  <Link
+                    href="/auth/login?redirect=/checkout"
+                    className="block w-full py-5 text-center bg-gradient-to-r from-gray-600 via-gray-700 to-gray-800 text-white font-black text-sm uppercase tracking-[0.15em] rounded-2xl shadow-2xl shadow-gray-500/30 hover:shadow-gray-500/50 hover:-translate-y-1 active:translate-y-0 transition-all duration-300"
+                  >
+                    🔒 Login to Checkout
+                  </Link>
+                )}
 
                 {/* Trust badges */}
                 <div className="grid grid-cols-3 gap-3 pt-4 border-t border-gray-100">
