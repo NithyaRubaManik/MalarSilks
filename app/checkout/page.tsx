@@ -302,10 +302,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <form onSubmit={handlePaymentSubmit} className="p-8 space-y-8">
-                    {/* Payment Options */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                      {/* COD */}
+                    <div className="grid grid-cols-1 gap-5">                      {/* COD */}
                       <label className={`relative flex flex-col gap-4 p-6 rounded-3xl cursor-pointer transition-all duration-300 border-3 ${
                         paymentMethod === 'COD'
                           ? 'border-red-500 bg-gradient-to-br from-red-50 to-orange-50 shadow-xl shadow-red-100'
@@ -330,32 +327,6 @@ export default function CheckoutPage() {
                           <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-red-500 to-orange-500 rounded-b-3xl" />
                         )}
                       </label>
-
-                      {/* Online */}
-                      <label className={`relative flex flex-col gap-4 p-6 rounded-3xl cursor-pointer transition-all duration-300 ${
-                        paymentMethod === 'Online'
-                          ? 'border-red-500 bg-gradient-to-br from-red-50 to-orange-50 shadow-xl shadow-red-100'
-                          : 'border-gray-200 bg-white hover:border-red-300 hover:bg-red-50/30 shadow-md'
-                      }`} style={{ borderWidth: paymentMethod === 'Online' ? '3px' : '2px', borderStyle: 'solid' }}>
-                        <input type="radio" name="payment" className="sr-only" checked={paymentMethod === 'Online'} onChange={() => setPaymentMethod('Online')} />
-                        <div className="flex justify-between items-start">
-                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${
-                            paymentMethod === 'Online' ? 'bg-red-600 shadow-lg shadow-red-400/40' : 'bg-gray-100'
-                          }`}>
-                            💳
-                          </div>
-                          {paymentMethod === 'Online' && (
-                            <CheckCircle2 className="w-6 h-6 text-red-600" />
-                          )}
-                        </div>
-                        <div>
-                          <h4 className="font-black text-gray-900 text-lg mb-1">Online Payment</h4>
-                          <p className="text-sm text-gray-500 leading-relaxed">Securely pay via UPI, internet banking, or debit/credit card.</p>
-                        </div>
-                        {paymentMethod === 'Online' && (
-                          <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-red-500 to-orange-500 rounded-b-3xl" />
-                        )}
-                      </label>
                     </div>
 
                     {/* Action buttons */}
@@ -375,9 +346,7 @@ export default function CheckoutPage() {
                         {isProcessing ? (
                           <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
                         ) : (
-                          paymentMethod === 'COD'
-                            ? `✅ Confirm Order — ₹${total.toLocaleString()}`
-                            : `💳 Pay Now — ₹${total.toLocaleString()}`
+                          `✅ Confirm Order — ₹${total.toLocaleString()}`
                         )}
                       </button>
                     </div>

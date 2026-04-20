@@ -178,6 +178,7 @@ const getMyOrders = async (req, res) => {
             ORDER BY created_at DESC
         `, [req.params.userId]);
         
+        const orders = [];
         for (const order of result.rows) {
             const itemsResult = await pool.query('SELECT * FROM order_items WHERE order_id = $1', [order.id]);
             
